@@ -1,6 +1,14 @@
 (function() {
   var initBackground, onClicked, onRequest, read;
 
+  if (localStorage['lastVersionUsed'] !== '0.0.1') {
+    localStorage['lastVersionUsed'] = '0.0.1';
+  }
+
+  chrome.tabs.create({
+    url: chrome.extension.getURL('options.html')
+  });
+
   read = function(text) {
     var cb, opts;
     text = encodeURIComponent(text);
@@ -11,7 +19,13 @@
       height: 600,
       type: "popup"
     };
-    cb = function(wind) {};
+    cb = function(wind) {
+      if (localStorage['fullscreen'] === "true") {
+        return chrome.windows.update(wind.id, {
+          state: "fullscreen"
+        });
+      }
+    };
     return chrome.windows.create(opts, cb);
   };
 

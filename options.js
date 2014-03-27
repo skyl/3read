@@ -4,11 +4,11 @@
 
 function load() {
 
+  // wpm
   var rateElement = document.getElementById('rate');
-  var rate = localStorage['rate'] || 350;
-
+  var rate = localStorage['rate'] || 300;
+  localStorage['rate'] = rate;
   document.getElementById('wpm_feedback').innerHTML = rate;
-
   rateElement.value = rate;
 
   function listener(evt) {
@@ -19,6 +19,20 @@ function load() {
   rateElement.addEventListener('change', listener, false);
   rateElement.addEventListener('keyup', listener, false);
   rateElement.addEventListener('mouseup', listener, false);
+
+
+  // fullscreen
+  fs = localStorage['fullscreen'] || "true";
+  fsElement = document.getElementById('fullscreen');
+  fsElement.checked = localStorage['fullscreen'] = (fs === "true");
+  function fslistener(evt) {
+    localStorage['fullscreen'] = fs = fsElement.checked
+  }
+  fsElement.addEventListener('change', fslistener, false);
+
+
+
+
 
   // getDefaultKeyString is from keycodes.js
   var defaultKeyString = getDefaultKeyString();

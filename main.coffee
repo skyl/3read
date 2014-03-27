@@ -1,10 +1,10 @@
 window.TEXT = urlParams['text']
-wpm = localStorage['rate'] or 350
+wpm = parseFloat(localStorage['rate'] or 350)
 
 
 options = {
   size: 16
-  height: 1
+  height: 5
   curveSegments: 2
 
   #font: "optimer"
@@ -36,7 +36,7 @@ class TextScene
     @meshes = []
     @words = @text.trim().split /\s+/g
     @word_place = 0
-    @create_pos = new THREE.Vector3 0, 0, 100
+    @create_pos = new THREE.Vector3 0, 0, 250
     @init()
 
   init: () ->
@@ -101,6 +101,11 @@ class TextScene
     @scene.add textMesh
     textMesh
 
+  rewind: (zunits=200) ->
+    @create_pos.z += zunits
+    for word in @meshes
+      word.position.z += zunits
+
   advance_words: () ->
     #console.log "ADVANCE", @meshes[0].material
     new_time = new Date().getTime()
@@ -116,17 +121,14 @@ class TextScene
       p = word.position
       centeredp = word.position.clone()
       p.z -= advance
-      centeredp.x = 0
-      centeredp.y = 0
-      lighten = 3.2  # magic
 
       # set opacity based on distance to origin
-      distance_to_origin = centeredp.distanceTo origin
-      if distance_to_origin < @options.delta / 2
-        opacity = 1
-      else
-        opacity = @options.delta / (distance_to_origin * lighten)
+      centeredp.x = 0
+      centeredp.y = 0
+      lighten = 3.5  # magic
 
+      distance_to_origin = centeredp.distanceTo origin
+      opacity = @options.delta / (distance_to_origin * lighten)
       word.material.opacity = opacity
 
       word.quaternion = @camera.quaternion
@@ -148,21 +150,37 @@ class TextScene
     @paused = true
 
   onKeyup: (ev) =>
+    # Alt+UP is rewind
+    if ev.altKey
+      if ev.keyCode is 38
+        @rewind()
+        return
+
     switch ev.keyCode
       when 32  # space
         if @paused
           @start()
         else
           @pause()
+      when 38  # up arrow
+        @options.wpm += 10
+        localStorage['rate'] = parseFloat(localStorage['rate']) + 10
+        console.log localStorage['rate']
+      when 40  # down arrow
+        @options.wpm -= 10
+        localStorage['rate'] = parseFloat(localStorage['rate']) - 10
+        console.log localStorage['rate']
+      when 27, 81  # escape or q
+        window.close()
+
+  onResize: (ev) =>
+    @renderer.setSize window.innerWidth, window.innerHeight
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 
 
-#material = new THREE.MeshFaceMaterial [
-#  new THREE.MeshPhongMaterial color: 0xffffff, shading: THREE.FlatShading
-#  new THREE.MeshPhongMaterial color: 0xffffff, shading: THREE.SmoothShading
-#]
-#material = new THREE.MeshBasicMaterial { color: 0xffffff }
 material = new THREE.MeshBasicMaterial color: 0xffffff, transparent: true, opacity: 0.5
 window.ts = new TextScene TEXT, material, options
 window.addEventListener "keyup", ts.onKeyup, false
+window.addEventListener 'resize', ts.onResize, false
 ts.start()
-

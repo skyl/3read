@@ -1,5 +1,12 @@
 #console.log "BACKGROUND!"
 
+if localStorage['lastVersionUsed'] isnt '0.0.1'
+  localStorage['lastVersionUsed'] = '0.0.1'
+chrome.tabs.create {
+  url: chrome.extension.getURL('options.html')
+}
+
+
 read = (text) ->
   text = encodeURIComponent text
   console.log "READING!", text
@@ -10,9 +17,8 @@ read = (text) ->
     type: "popup"
   }
   cb = (wind) ->
-    #console.log "cb!!!!!"
-    #console.log wind
-    #chrome.windows.update wind.id, {state: "fullscreen"}
+    if localStorage['fullscreen'] is "true"
+      chrome.windows.update wind.id, {state: "fullscreen"}
   chrome.windows.create opts, cb
 
 

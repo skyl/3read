@@ -4,11 +4,11 @@
 
   window.TEXT = urlParams['text'];
 
-  wpm = localStorage['rate'] || 350;
+  wpm = parseFloat(localStorage['rate'] || 350);
 
   options = {
     size: 16,
-    height: 1,
+    height: 5,
     curveSegments: 2,
     font: "ubuntu",
     style: "normal",
@@ -29,12 +29,13 @@
       this.text = text;
       this.material = material;
       this.options = options;
+      this.onResize = __bind(this.onResize, this);
       this.onKeyup = __bind(this.onKeyup, this);
       this.render = __bind(this.render, this);
       this.meshes = [];
       this.words = this.text.trim().split(/\s+/g);
       this.word_place = 0;
-      this.create_pos = new THREE.Vector3(0, 0, 100);
+      this.create_pos = new THREE.Vector3(0, 0, 250);
       this.init();
     }
 
@@ -117,6 +118,21 @@
       return textMesh;
     };
 
+    TextScene.prototype.rewind = function(zunits) {
+      var word, _i, _len, _ref, _results;
+      if (zunits == null) {
+        zunits = 200;
+      }
+      this.create_pos.z += zunits;
+      _ref = this.meshes;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        word = _ref[_i];
+        _results.push(word.position.z += zunits);
+      }
+      return _results;
+    };
+
     TextScene.prototype.advance_words = function() {
       var advance, centeredp, diff_sec, distance_to_origin, lighten, new_time, num_words, opacity, p, word, words_per_second, _i, _len, _ref, _results;
       new_time = new Date().getTime();
@@ -135,13 +151,9 @@
         p.z -= advance;
         centeredp.x = 0;
         centeredp.y = 0;
-        lighten = 3.2;
+        lighten = 3.5;
         distance_to_origin = centeredp.distanceTo(origin);
-        if (distance_to_origin < this.options.delta / 2) {
-          opacity = 1;
-        } else {
-          opacity = this.options.delta / (distance_to_origin * lighten);
-        }
+        opacity = this.options.delta / (distance_to_origin * lighten);
         word.material.opacity = opacity;
         _results.push(word.quaternion = this.camera.quaternion);
       }
@@ -170,6 +182,12 @@
     };
 
     TextScene.prototype.onKeyup = function(ev) {
+      if (ev.altKey) {
+        if (ev.keyCode === 38) {
+          this.rewind();
+          return;
+        }
+      }
       switch (ev.keyCode) {
         case 32:
           if (this.paused) {
@@ -177,7 +195,25 @@
           } else {
             return this.pause();
           }
+          break;
+        case 38:
+          this.options.wpm += 10;
+          localStorage['rate'] = parseFloat(localStorage['rate']) + 10;
+          return console.log(localStorage['rate']);
+        case 40:
+          this.options.wpm -= 10;
+          localStorage['rate'] = parseFloat(localStorage['rate']) - 10;
+          return console.log(localStorage['rate']);
+        case 27:
+        case 81:
+          return window.close();
       }
+    };
+
+    TextScene.prototype.onResize = function(ev) {
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      return camera.updateProjectionMatrix();
     };
 
     return TextScene;
@@ -193,6 +229,8 @@
   window.ts = new TextScene(TEXT, material, options);
 
   window.addEventListener("keyup", ts.onKeyup, false);
+
+  window.addEventListener('resize', ts.onResize, false);
 
   ts.start();
 

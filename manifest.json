@@ -1,6 +1,6 @@
 {
   "name": "3read",
-  "version": "0.1",
+  "version": "0.0.1",
   "description": "3read the current selection.",
   "permissions": [
     "<all_urls>",
