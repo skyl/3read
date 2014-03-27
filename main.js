@@ -128,13 +128,14 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         word = _ref[_i];
-        _results.push(word.position.z += zunits);
+        word.position.z += zunits;
+        _results.push(this.doctor_word(word));
       }
       return _results;
     };
 
     TextScene.prototype.advance_words = function() {
-      var advance, centeredp, diff_sec, distance_to_origin, lighten, new_time, num_words, opacity, p, word, words_per_second, _i, _len, _ref, _results;
+      var advance, diff_sec, new_time, num_words, p, word, words_per_second, _i, _len, _ref, _results;
       new_time = new Date().getTime();
       diff_sec = (new_time - this.time) / 1000.0;
       words_per_second = this.options.wpm / 60.0;
@@ -146,18 +147,22 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         word = _ref[_i];
-        p = word.position;
-        centeredp = word.position.clone();
-        p.z -= advance;
-        centeredp.x = 0;
-        centeredp.y = 0;
-        lighten = 3.5;
-        distance_to_origin = centeredp.distanceTo(origin);
-        opacity = this.options.delta / (distance_to_origin * lighten);
-        word.material.opacity = opacity;
-        _results.push(word.quaternion = this.camera.quaternion);
+        p = word.position.z -= advance;
+        _results.push(this.doctor_word(word));
       }
       return _results;
+    };
+
+    TextScene.prototype.doctor_word = function(word) {
+      var centeredp, distance_to_origin, lighten, opacity;
+      centeredp = word.position.clone();
+      centeredp.x = 0;
+      centeredp.y = 0;
+      lighten = 3.0;
+      distance_to_origin = centeredp.distanceTo(origin);
+      opacity = this.options.delta / (distance_to_origin * lighten);
+      word.material.opacity = opacity;
+      return word.quaternion = this.camera.quaternion;
     };
 
     TextScene.prototype.render = function() {

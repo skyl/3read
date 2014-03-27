@@ -101,10 +101,12 @@ class TextScene
     @scene.add textMesh
     textMesh
 
+  # 20 * 10 with 1 advance
   rewind: (zunits=200) ->
     @create_pos.z += zunits
     for word in @meshes
       word.position.z += zunits
+      @doctor_word word
 
   advance_words: () ->
     #console.log "ADVANCE", @meshes[0].material
@@ -118,19 +120,18 @@ class TextScene
     @init_text num_words, advance
 
     for word in @meshes
-      p = word.position
-      centeredp = word.position.clone()
-      p.z -= advance
+      p = word.position.z -= advance
+      @doctor_word word
 
+  doctor_word: (word) ->
       # set opacity based on distance to origin
+      centeredp = word.position.clone()
       centeredp.x = 0
       centeredp.y = 0
-      lighten = 3.5  # magic
-
+      lighten = 3.0  # magic
       distance_to_origin = centeredp.distanceTo origin
       opacity = @options.delta / (distance_to_origin * lighten)
       word.material.opacity = opacity
-
       word.quaternion = @camera.quaternion
 
   render: () =>
