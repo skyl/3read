@@ -1,0 +1,121 @@
+<html>
+<head>
+  <title>Speak Selection Options</title>
+  <style>
+    body {
+      font-family: arial, helvetica, sans-serif;
+    }
+    .banner {
+      width: 100%;
+      float: left;
+    }
+    .banner_left {
+      padding: 8px;
+      float: left;
+    }
+    .banner_right {
+      padding: 8px;
+    }
+    .body_wrapper {
+      width: 100%;
+      float: left;
+    }
+    .body_left {
+      border: 0;
+      padding: 0;
+      margin: 0;
+      width: 50%;
+      float: left;
+    }
+    .body_right {
+      border: 0;
+      padding: 0;
+      margin: 0;
+      width: 46%;
+      float: left;
+    }
+    .body_inner {
+      padding: 0 32px;
+    }
+    .browser_action {
+      vertical-align: middle;
+      margin: 0 2px 3px 2px;
+    }
+    .ctrl_label {
+      width: 100px;
+      float: left;
+    }
+    .ctrl_wrap {
+      margin: 18px 8px;
+    }
+    .ctrl {
+      width: 200px;
+    }
+    #hotkey {
+      font-size: 16px;
+      width: 15em;
+      margin-left: 12px;
+    }
+    #test {
+    }
+    #defaults {
+      margin-left: 24px;
+    }
+  </style>
+  <script src="keycodes.js"></script>
+  <script src="tabs.js"></script>
+  <script src="options.js"></script>
+  <script src="content_script.js"></script>
+</head>
+<body>
+
+<div class="banner">
+  <div class="banner_left">
+    <img src="SpeakSel128.png" class="logo" alt="">
+  </div>
+  <div class="banner_right">
+    <h1>3read</h1>
+    <p>
+      This extension helps you speed read in 3d.
+    </p>
+  </div>
+</div>
+
+<div class="body_wrapper">
+
+  <div class="body_left">
+    <div class="body_inner">
+      <h2>Settings</h2>
+      <div class="ctrl_label">
+        <label for="rate">WPM:</label>
+      </div>
+      <div class="ctrl_wrap">
+        <input id="rate" type="range" class="ctrl"
+               min=10 max=1000 step=10 value=350></input>
+        <!-- TODO - angular -->
+        <span id="wpm_feedback">hello</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="body_right">
+    <div class="body_inner">
+      <h2>When to 3read</h2>
+      <p>
+        <span id="selected">Select some text</span>
+        anywhere on a webpage, then either:
+      </p>
+
+      <p>1. Click on the
+        <img class="browser_action" src="icon_19.png" alt="3read icon">
+        button in the toolbar &#x2197;, or
+      </p>
+      <p>2. Use this hot key: <input type="text" id="hotkey"></input>
+      </p>
+      <p>Press the key again to close the window.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
