@@ -2,9 +2,9 @@
 
 if localStorage['lastVersionUsed'] isnt '0.0.1'
   localStorage['lastVersionUsed'] = '0.0.1'
-chrome.tabs.create {
-  url: chrome.extension.getURL('options.html')
-}
+  chrome.tabs.create {
+    url: chrome.extension.getURL('options.html')
+  }
 
 
 read = (text) ->

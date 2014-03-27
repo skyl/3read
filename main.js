@@ -8,7 +8,7 @@
 
   options = {
     size: 16,
-    height: 5,
+    height: 2,
     curveSegments: 2,
     font: "ubuntu",
     style: "normal",

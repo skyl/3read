@@ -1,7 +1,7 @@
 {
   "name": "3read",
   "version": "0.0.1",
-  "description": "3read the current selection.",
+  "description": "3read allows you to read selected text in 3 dimensions.",
   "permissions": [
     "<all_urls>",
     "tabs"
@@ -22,7 +22,7 @@
 
   "options_page": "options.html",
 
-  "minimum_chrome_version": "14",
+  "minimum_chrome_version": "18",
 
   "content_scripts": [
     {

@@ -4,7 +4,7 @@ wpm = parseFloat(localStorage['rate'] or 350)
 
 options = {
   size: 16
-  height: 5
+  height: 2
   curveSegments: 2
 
   #font: "optimer"
