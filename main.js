@@ -198,12 +198,10 @@
           break;
         case 38:
           this.options.wpm += 10;
-          localStorage['rate'] = parseFloat(localStorage['rate']) + 10;
-          return console.log(localStorage['rate']);
+          return localStorage['rate'] = parseFloat(localStorage['rate']) + 10;
         case 40:
           this.options.wpm -= 10;
-          localStorage['rate'] = parseFloat(localStorage['rate']) - 10;
-          return console.log(localStorage['rate']);
+          return localStorage['rate'] = parseFloat(localStorage['rate']) - 10;
         case 27:
         case 81:
           return window.close();

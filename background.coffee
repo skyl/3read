@@ -9,7 +9,7 @@ if localStorage['lastVersionUsed'] isnt '0.0.1'
 
 read = (text) ->
   text = encodeURIComponent text
-  console.log "READING!", text
+  # console.log "READING!", text
   opts = {
     url: chrome.extension.getURL("main.html?text=#{text}")
     width: 960

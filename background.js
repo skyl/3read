@@ -11,7 +11,6 @@
   read = function(text) {
     var cb, opts;
     text = encodeURIComponent(text);
-    console.log("READING!", text);
     opts = {
       url: chrome.extension.getURL("main.html?text=" + text),
       width: 960,

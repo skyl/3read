@@ -165,11 +165,9 @@ class TextScene
       when 38  # up arrow
         @options.wpm += 10
         localStorage['rate'] = parseFloat(localStorage['rate']) + 10
-        console.log localStorage['rate']
       when 40  # down arrow
         @options.wpm -= 10
         localStorage['rate'] = parseFloat(localStorage['rate']) - 10
-        console.log localStorage['rate']
       when 27, 81  # escape or q
         window.close()
 
