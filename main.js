@@ -34,7 +34,6 @@
       this.onResize = __bind(this.onResize, this);
       this.onKeyup = __bind(this.onKeyup, this);
       this.render = __bind(this.render, this);
-      this.meshes = [];
       this.words = this.text.trim().split(/\s+/g);
       this.word_place = 0;
       this.create_pos = new THREE.Vector3(0, 0, this.options.delta * 10);
@@ -58,6 +57,8 @@
       this.camera.position.y = 100;
       this.camera.position.z = 100;
       this.camera.lookAt(origin);
+      this.group = new THREE.Object3D();
+      this.scene.add(this.group);
       return this.init_text();
     };
 
@@ -121,29 +122,22 @@
       textMesh = new THREE.Mesh(textGeo, this.material.clone());
       textMesh.position = pos.clone();
       textMesh.position.x = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
-      this.meshes.push(textMesh);
-      this.scene.add(textMesh);
+      textMesh.position.z -= this.group.position.z;
+      textMesh.quaternion = this.camera.quaternion;
+      this.group.add(textMesh);
       return textMesh;
     };
 
     TextScene.prototype.rewind = function(zunits) {
-      var word, _i, _len, _ref, _results;
       if (zunits == null) {
         zunits = 200;
       }
       this.create_pos.z += zunits;
-      _ref = this.meshes;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        word = _ref[_i];
-        word.position.z += zunits;
-        _results.push(this.doctor_word(word));
-      }
-      return _results;
+      return this.group.position.z += zunits;
     };
 
     TextScene.prototype.advance_words = function() {
-      var advance, diff_sec, new_time, num_words, p, word, words_per_second, _i, _len, _ref, _results;
+      var advance, diff_sec, new_time, num_words, words_per_second;
       new_time = new Date().getTime();
       diff_sec = (new_time - this.time) / 1000.0;
       words_per_second = this.options.wpm / 60.0;
@@ -151,25 +145,24 @@
       num_words = words_per_second * diff_sec;
       advance = num_words * this.options.delta;
       this.init_text(num_words, advance);
-      _ref = this.meshes;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        word = _ref[_i];
-        p = word.position.z -= advance;
-        _results.push(this.doctor_word(word));
-      }
-      return _results;
+      this.group.position.z -= advance;
+      return this.set_opacities();
     };
 
-    TextScene.prototype.doctor_word = function(word) {
-      var centeredp, distance_to_origin, opacity;
-      centeredp = word.position.clone();
-      centeredp.x = 0;
-      centeredp.y = 0;
-      distance_to_origin = centeredp.distanceTo(window.focus);
-      opacity = this.options.delta / distance_to_origin;
-      word.material.opacity = opacity;
-      return word.quaternion = this.camera.quaternion;
+    TextScene.prototype.set_opacities = function() {
+      var distance_to_focus, mesh, opacity, x, y, z, _i, _len, _ref, _results;
+      _ref = this.group.children;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        mesh = _ref[_i];
+        x = 0;
+        y = 0;
+        z = mesh.position.z + this.group.position.z;
+        distance_to_focus = (new THREE.Vector3(x, y, z)).distanceTo(window.focus);
+        opacity = this.options.delta / distance_to_focus;
+        _results.push(mesh.material.opacity = opacity);
+      }
+      return _results;
     };
 
     TextScene.prototype.render = function() {
