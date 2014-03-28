@@ -20,7 +20,7 @@ options = {
   extrudeMaterial: 1
 
   delta: 10
-  debug: true
+  #debug: true
 
   axis: "z"
   wpm: wpm
@@ -28,6 +28,7 @@ options = {
 }
 
 window.origin = new THREE.Vector3 0, 0, 0
+window.focus = new THREE.Vector3 0, 0, 40
 
 
 class TextScene
@@ -36,14 +37,14 @@ class TextScene
     @meshes = []
     @words = @text.trim().split /\s+/g
     @word_place = 0
-    @create_pos = new THREE.Vector3 0, 0, 250
+    @create_pos = new THREE.Vector3 0, 0, @options.delta * 10
     @init()
 
   init: () ->
     @scene = new THREE.Scene()
     ratio = window.innerWidth / window.innerHeight
     window.camera = @camera = new THREE.PerspectiveCamera 75, ratio, 0.1, 4000
-    @renderer = new THREE.WebGLRenderer();
+    @renderer = new THREE.WebGLRenderer()
     @renderer.setSize window.innerWidth, window.innerHeight
     document.body.appendChild @renderer.domElement
 
@@ -86,13 +87,13 @@ class TextScene
       tm = @create_word word, @create_pos
       # add extra space for punctuation
       if (word.indexOf(".") isnt -1) and (word.split('.').length - 1 == 1)
-        @create_pos.z += advance * 3
+        @create_pos.z += advance * 2
       if word.indexOf(",") isnt -1
         @create_pos.z += advance * 1
     @word_place = next
 
   create_word: (word, pos) ->
-    console.log pos
+
     textGeo = new THREE.TextGeometry word, @options
     textGeo.computeBoundingBox()
     textGeo.computeVertexNormals()
@@ -133,9 +134,8 @@ class TextScene
       centeredp = word.position.clone()
       centeredp.x = 0
       centeredp.y = 0
-      lighten = 3.0  # magic
-      distance_to_origin = centeredp.distanceTo origin
-      opacity = @options.delta / (distance_to_origin * lighten)
+      distance_to_origin = centeredp.distanceTo window.focus
+      opacity = @options.delta / distance_to_origin
       word.material.opacity = opacity
       word.quaternion = @camera.quaternion
 

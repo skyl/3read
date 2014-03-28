@@ -7,8 +7,8 @@
   wpm = parseFloat(localStorage['rate'] || 350);
 
   options = {
-    size: 16,
-    height: 2,
+    size: 10,
+    height: 0,
     curveSegments: 2,
     font: "ubuntu",
     style: "normal",
@@ -17,12 +17,14 @@
     bevelEnabled: false,
     material: 0,
     extrudeMaterial: 1,
-    delta: 20,
+    delta: 10,
     axis: "z",
     wpm: wpm
   };
 
   window.origin = new THREE.Vector3(0, 0, 0);
+
+  window.focus = new THREE.Vector3(0, 0, 40);
 
   TextScene = (function() {
     function TextScene(text, material, options) {
@@ -35,7 +37,7 @@
       this.meshes = [];
       this.words = this.text.trim().split(/\s+/g);
       this.word_place = 0;
-      this.create_pos = new THREE.Vector3(0, 0, 250);
+      this.create_pos = new THREE.Vector3(0, 0, this.options.delta * 10);
       this.init();
     }
 
@@ -93,7 +95,7 @@
         per = 1;
       }
       if (advance == null) {
-        advance = 1;
+        advance = 0;
       }
       next = this.word_place + per;
       _ref = this.words.slice(this.word_place, next);
@@ -101,6 +103,12 @@
         word = _ref[_i];
         this.create_pos.z += advance;
         tm = this.create_word(word, this.create_pos);
+        if ((word.indexOf(".") !== -1) && (word.split('.').length - 1 === 1)) {
+          this.create_pos.z += advance * 2;
+        }
+        if (word.indexOf(",") !== -1) {
+          this.create_pos.z += advance * 1;
+        }
       }
       return this.word_place = next;
     };
@@ -154,13 +162,12 @@
     };
 
     TextScene.prototype.doctor_word = function(word) {
-      var centeredp, distance_to_origin, lighten, opacity;
+      var centeredp, distance_to_origin, opacity;
       centeredp = word.position.clone();
       centeredp.x = 0;
       centeredp.y = 0;
-      lighten = 3.0;
-      distance_to_origin = centeredp.distanceTo(origin);
-      opacity = this.options.delta / (distance_to_origin * lighten);
+      distance_to_origin = centeredp.distanceTo(window.focus);
+      opacity = this.options.delta / distance_to_origin;
       word.material.opacity = opacity;
       return word.quaternion = this.camera.quaternion;
     };
