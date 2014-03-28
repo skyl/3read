@@ -3,8 +3,8 @@ wpm = parseFloat(localStorage['rate'] or 350)
 
 
 options = {
-  size: 16
-  height: 2
+  size: 10
+  height: 0
   curveSegments: 2
 
   #font: "optimer"
@@ -19,8 +19,8 @@ options = {
   material: 0
   extrudeMaterial: 1
 
-  delta: 20
-  #debug: true
+  delta: 10
+  debug: true
 
   axis: "z"
   wpm: wpm
@@ -79,15 +79,20 @@ class TextScene
     make_line new THREE.Vector3(0, -l, 0), new THREE.Vector3(0, l, 0)
     make_line new THREE.Vector3(0, 0, -l), new THREE.Vector3(0, 0, l)
 
-  init_text: (per=1, advance=1) ->
+  init_text: (per=1, advance=0) ->
     next = @word_place + per
     for word in @words.slice @word_place, next
       @create_pos.z += advance
       tm = @create_word word, @create_pos
+      # add extra space for punctuation
+      if (word.indexOf(".") isnt -1) and (word.split('.').length - 1 == 1)
+        @create_pos.z += advance * 3
+      if word.indexOf(",") isnt -1
+        @create_pos.z += advance * 1
     @word_place = next
 
   create_word: (word, pos) ->
-
+    console.log pos
     textGeo = new THREE.TextGeometry word, @options
     textGeo.computeBoundingBox()
     textGeo.computeVertexNormals()
