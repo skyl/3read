@@ -104,10 +104,10 @@
         this.create_pos.z += advance;
         tm = this.create_word(word, this.create_pos);
         if ((word.indexOf(".") !== -1) && (word.split('.').length - 1 === 1)) {
-          this.create_pos.z += advance * 2;
+          this.create_pos.z += advance * 4;
         }
         if (word.indexOf(",") !== -1) {
-          this.create_pos.z += advance * 1;
+          this.create_pos.z += advance * 2;
         }
       }
       return this.word_place = next;
