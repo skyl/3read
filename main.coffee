@@ -113,7 +113,7 @@ class TextScene
   rewind: (zunits=200) ->
     @create_pos.z += zunits
     @group.position.z += zunits
-    #@doctor_words zunits
+    @set_opacities
 
   advance_words: () ->
     new_time = new Date().getTime()

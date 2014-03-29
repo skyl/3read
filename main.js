@@ -133,7 +133,8 @@
         zunits = 200;
       }
       this.create_pos.z += zunits;
-      return this.group.position.z += zunits;
+      this.group.position.z += zunits;
+      return this.set_opacities;
     };
 
     TextScene.prototype.advance_words = function() {
