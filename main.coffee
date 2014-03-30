@@ -34,7 +34,6 @@ window.focus = new THREE.Vector3 0, 0, 40
 class TextScene
 
   constructor: (@text, @material, @options) ->
-    @meshes = []
     @words = @text.trim().split /\s+/g
     @word_place = 0
     @create_pos = new THREE.Vector3 0, 0, @options.delta * 10
@@ -57,6 +56,8 @@ class TextScene
     @camera.position.y = 100
     @camera.position.z = 100
     @camera.lookAt origin
+    @group = new THREE.Object3D()
+    @scene.add @group
 
     @init_text()
 
@@ -93,6 +94,7 @@ class TextScene
     @word_place = next
 
   create_word: (word, pos) ->
+    #console.log pos
 
     textGeo = new THREE.TextGeometry word, @options
     textGeo.computeBoundingBox()
@@ -100,22 +102,20 @@ class TextScene
 
     textMesh = new THREE.Mesh textGeo, @material.clone()
     textMesh.position = pos.clone()
-
     textMesh.position.x = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x)
+    textMesh.position.z -= @group.position.z
+    textMesh.quaternion = @camera.quaternion
 
-    @meshes.push textMesh
-    @scene.add textMesh
+    @group.add textMesh
     textMesh
 
   # 20 * 10 with 1 advance
   rewind: (zunits=200) ->
     @create_pos.z += zunits
-    for word in @meshes
-      word.position.z += zunits
-      @doctor_word word
+    @group.position.z += zunits
+    @set_opacities
 
   advance_words: () ->
-    #console.log "ADVANCE", @meshes[0].material
     new_time = new Date().getTime()
     diff_sec = (new_time - @time) / 1000.0
     words_per_second = @options.wpm / 60.0
@@ -125,19 +125,22 @@ class TextScene
     advance = num_words * @options.delta
     @init_text num_words, advance
 
-    for word in @meshes
-      p = word.position.z -= advance
-      @doctor_word word
+    #change = -advance
+    @group.position.z -= advance
+    @set_opacities()
 
-  doctor_word: (word) ->
-      # set opacity based on distance to origin
-      centeredp = word.position.clone()
-      centeredp.x = 0
-      centeredp.y = 0
-      distance_to_origin = centeredp.distanceTo window.focus
-      opacity = @options.delta / distance_to_origin
-      word.material.opacity = opacity
-      word.quaternion = @camera.quaternion
+  set_opacities: () ->
+    # set opacity based on distance to origin
+    for mesh in @group.children
+      #mesh.position.z += change
+      #centeredp = mesh.position.clone()
+      x = 0
+      y = 0
+      z = mesh.position.z + @group.position.z
+      distance_to_focus = (new THREE.Vector3(x, y, z)).distanceTo window.focus
+      opacity = @options.delta / distance_to_focus
+      mesh.material.opacity = opacity
+      #mesh.quaternion = @camera.quaternion
 
   render: () =>
     requestAnimationFrame @render
