@@ -20,7 +20,7 @@ options = {
   extrudeMaterial: 1
 
   delta: 12
-  debug: true
+  #debug: true
 
   axis: "z"
   wpm: wpm

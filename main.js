@@ -18,7 +18,6 @@
     material: 0,
     extrudeMaterial: 1,
     delta: 12,
-    debug: true,
     axis: "z",
     wpm: wpm
   };
