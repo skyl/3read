@@ -156,9 +156,9 @@ class TextScene
       tm = @create_word word, @create_pos
       # add extra space for punctuation
       if (word.indexOf(".") isnt -1) and (word.split('.').length - 1 == 1)
-        @create_pos.z += advance * 2
+        @create_pos.z += advance * 4
       if word.indexOf(",") isnt -1
-        @create_pos.z += advance * 1
+        @create_pos.z += advance * 2
     @word_place = next
 
   create_word: (word, pos) ->
