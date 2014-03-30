@@ -19,8 +19,8 @@ options = {
   material: 0
   extrudeMaterial: 1
 
-  delta: 10
-  #debug: true
+  delta: 12
+  debug: true
 
   axis: "z"
   wpm: wpm
@@ -146,9 +146,9 @@ class TextScene
     requestAnimationFrame @render
     if not @paused
       @advance_words()
-    if @options.debug
-      @stats.update()
-    @renderer.render @scene, @camera
+      @renderer.render @scene, @camera
+      if @options.debug
+        @stats.update()
 
   start: () ->
     @time = new Date().getTime()
