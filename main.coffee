@@ -3,6 +3,7 @@ wpm = parseFloat(localStorage['rate'] or 350)
 
 
 options = {
+  color: new THREE.Color(0xffffff)
   size: 10
   height: 0
   curveSegments: 2
@@ -19,7 +20,7 @@ options = {
   material: 0
   extrudeMaterial: 1
 
-  delta: 10
+  delta: 11
   #debug: true
 
   axis: "z"
@@ -29,6 +30,73 @@ options = {
 
 window.origin = new THREE.Vector3 0, 0, 0
 window.focus = new THREE.Vector3 0, 0, 40
+
+
+vertex_shader = """
+/*
+attribute float alpha;
+varying float vAlpha;
+
+void main() {
+  vAlpha = alpha;
+  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+  gl_PointSize = 20.0;
+  gl_Position = projectionMatrix * mvPosition;
+}
+*/
+
+uniform float delta;
+uniform float focus;
+
+varying float vAlpha;
+
+float diff;
+
+void main() {
+  //vAlpha = 10.0 / abs(position.x);
+  //vAlpha = 10.0 / position.y;
+  //vAlpha = position.z;
+  gl_Position = projectionMatrix *
+                modelViewMatrix *
+                vec4(position, 1.0);
+
+  diff = abs(gl_Position.y - focus);
+  //if (diff < delta) {
+  //  vAlpha = 1.0;
+  //} else {
+    vAlpha = 20.0 / diff;
+  //}
+}
+"""
+
+fragment_shader = """
+uniform vec3 color;
+varying float vAlpha;
+//varying float red;
+
+void main() {
+  gl_FragColor = vec4(color, vAlpha);
+}
+"""
+
+# attributes
+attributes = {
+  alpha: {type: 'f', value: []}
+}
+# uniforms
+uniforms = {
+  color: {type: "c", value: options.color}
+  # these are in 2d y, for now ...
+  delta: {type: "f", value: options.delta / 10.0}
+  focus: {type: "f", value: -40.0}
+}
+shaderMaterial = new THREE.ShaderMaterial {
+  uniforms: uniforms
+  attributes: attributes
+  vertexShader: vertex_shader
+  fragmentShader: fragment_shader
+  transparent:    true
+}
 
 
 class TextScene
@@ -94,13 +162,11 @@ class TextScene
     @word_place = next
 
   create_word: (word, pos) ->
-    #console.log pos
-
     textGeo = new THREE.TextGeometry word, @options
     textGeo.computeBoundingBox()
     textGeo.computeVertexNormals()
 
-    textMesh = new THREE.Mesh textGeo, @material.clone()
+    textMesh = new THREE.Mesh textGeo, @material
     textMesh.position = pos.clone()
     textMesh.position.x = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x)
     textMesh.position.z -= @group.position.z
@@ -127,7 +193,7 @@ class TextScene
 
     #change = -advance
     @group.position.z -= advance
-    @set_opacities()
+    #@set_opacities()
 
   set_opacities: () ->
     # set opacity based on distance to origin
@@ -186,7 +252,8 @@ class TextScene
     camera.updateProjectionMatrix();
 
 
-material = new THREE.MeshBasicMaterial color: 0xffffff, transparent: true, opacity: 0.5
+#material = new THREE.MeshBasicMaterial color: 0xffffff, transparent: true, opacity: 0.5
+material = shaderMaterial
 window.ts = new TextScene TEXT, material, options
 window.addEventListener "keyup", ts.onKeyup, false
 window.addEventListener 'resize', ts.onResize, false

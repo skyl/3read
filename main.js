@@ -1,5 +1,5 @@
 (function() {
-  var TextScene, material, options, wpm,
+  var TextScene, attributes, fragment_shader, material, options, shaderMaterial, uniforms, vertex_shader, wpm,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   window.TEXT = urlParams['text'];
@@ -7,6 +7,7 @@
   wpm = parseFloat(localStorage['rate'] || 350);
 
   options = {
+    color: new THREE.Color(0xffffff),
     size: 10,
     height: 0,
     curveSegments: 2,
@@ -17,7 +18,7 @@
     bevelEnabled: false,
     material: 0,
     extrudeMaterial: 1,
-    delta: 10,
+    delta: 11,
     axis: "z",
     wpm: wpm
   };
@@ -25,6 +26,40 @@
   window.origin = new THREE.Vector3(0, 0, 0);
 
   window.focus = new THREE.Vector3(0, 0, 40);
+
+  vertex_shader = "/*\nattribute float alpha;\nvarying float vAlpha;\n\nvoid main() {\n  vAlpha = alpha;\n  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);\n  gl_PointSize = 20.0;\n  gl_Position = projectionMatrix * mvPosition;\n}\n*/\n\nuniform float delta;\nuniform float focus;\n\nvarying float vAlpha;\n\nfloat diff;\n\nvoid main() {\n  //vAlpha = 10.0 / abs(position.x);\n  //vAlpha = 10.0 / position.y;\n  //vAlpha = position.z;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position, 1.0);\n\n  diff = abs(gl_Position.y - focus);\n  //if (diff < delta) {\n  //  vAlpha = 1.0;\n  //} else {\n    vAlpha = 20.0 / diff;\n  //}\n}";
+
+  fragment_shader = "uniform vec3 color;\nvarying float vAlpha;\n//varying float red;\n\nvoid main() {\n  gl_FragColor = vec4(color, vAlpha);\n}";
+
+  attributes = {
+    alpha: {
+      type: 'f',
+      value: []
+    }
+  };
+
+  uniforms = {
+    color: {
+      type: "c",
+      value: options.color
+    },
+    delta: {
+      type: "f",
+      value: options.delta / 10.0
+    },
+    focus: {
+      type: "f",
+      value: -40.0
+    }
+  };
+
+  shaderMaterial = new THREE.ShaderMaterial({
+    uniforms: uniforms,
+    attributes: attributes,
+    vertexShader: vertex_shader,
+    fragmentShader: fragment_shader,
+    transparent: true
+  });
 
   TextScene = (function() {
     function TextScene(text, material, options) {
@@ -119,7 +154,7 @@
       textGeo = new THREE.TextGeometry(word, this.options);
       textGeo.computeBoundingBox();
       textGeo.computeVertexNormals();
-      textMesh = new THREE.Mesh(textGeo, this.material.clone());
+      textMesh = new THREE.Mesh(textGeo, this.material);
       textMesh.position = pos.clone();
       textMesh.position.x = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
       textMesh.position.z -= this.group.position.z;
@@ -146,8 +181,7 @@
       num_words = words_per_second * diff_sec;
       advance = num_words * this.options.delta;
       this.init_text(num_words, advance);
-      this.group.position.z -= advance;
-      return this.set_opacities();
+      return this.group.position.z -= advance;
     };
 
     TextScene.prototype.set_opacities = function() {
@@ -224,11 +258,7 @@
 
   })();
 
-  material = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.5
-  });
+  material = shaderMaterial;
 
   window.ts = new TextScene(TEXT, material, options);
 
