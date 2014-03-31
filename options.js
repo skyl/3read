@@ -22,7 +22,7 @@ function load() {
 
 
   // fullscreen
-  fs = localStorage['fullscreen'] || "true";
+  fs = localStorage['fullscreen'] || "false";
   fsElement = document.getElementById('fullscreen');
   fsElement.checked = localStorage['fullscreen'] = (fs === "true");
   function fslistener(evt) {

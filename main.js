@@ -20,14 +20,15 @@
     extrudeMaterial: 1,
     delta: 12,
     axis: "z",
-    wpm: wpm
+    wpm: wpm,
+    away: true
   };
 
   window.origin = new THREE.Vector3(0, 0, 0);
 
   window.focus = new THREE.Vector3(0, 0, 40);
 
-  vertex_shader = "/*\nattribute float alpha;\nvarying float vAlpha;\n\nvoid main() {\n  vAlpha = alpha;\n  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);\n  gl_PointSize = 20.0;\n  gl_Position = projectionMatrix * mvPosition;\n}\n*/\n\nuniform float delta;\nuniform float focus;\n\nvarying float vAlpha;\n\nfloat diff;\n\nvoid main() {\n  //vAlpha = 10.0 / abs(position.x);\n  //vAlpha = 10.0 / position.y;\n  //vAlpha = position.z;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position, 1.0);\n\n  diff = abs(gl_Position.y - focus);\n  //if (diff < delta) {\n  //  vAlpha = 1.0;\n  //} else {\n    vAlpha = 20.0 / diff;\n  //}\n}";
+  vertex_shader = "/*\nattribute float alpha;\nvarying float vAlpha;\n\nvoid main() {\n  vAlpha = alpha;\n  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);\n  gl_PointSize = 20.0;\n  gl_Position = projectionMatrix * mvPosition;\n}\n*/\n\nuniform float delta;\nuniform float focus;\n\nvarying float vAlpha;\n\nfloat diff;\n\nvoid main() {\n  //vAlpha = 10.0 / abs(position.x);\n  //vAlpha = 10.0 / position.y;\n  //vAlpha = position.z;\n  gl_Position = projectionMatrix *\n                modelViewMatrix *\n                vec4(position, 1.0);\n\n  diff = abs(gl_Position.y - focus);\n  //if (diff < delta) {\n  //  vAlpha = 1.0;\n  //} else {\n    vAlpha = 25.0 / diff;\n  //}\n}";
 
   fragment_shader = "uniform vec3 color;\nvarying float vAlpha;\n//varying float red;\n\nvoid main() {\n  gl_FragColor = vec4(color, vAlpha);\n}";
 
@@ -71,7 +72,13 @@
       this.animate = __bind(this.animate, this);
       this.words = this.text.trim().split(/\s+/g);
       this.word_place = 0;
-      this.create_pos = new THREE.Vector3(0, 0, this.options.delta * 10);
+      if (this.options.away) {
+        this.create_pos = new THREE.Vector3(0, 0, this.options.delta * 10);
+        this.limit = -500;
+      } else {
+        this.create_pos = new THREE.Vector3(0, 0, -(this.options.delta * 10));
+        this.limit = 500;
+      }
       this.init();
     }
 
@@ -167,28 +174,51 @@
       if (zunits == null) {
         zunits = 200;
       }
-      this.create_pos.z += zunits;
-      this.group.position.z += zunits;
+      if (this.options.away) {
+        this.create_pos.z += zunits;
+        this.group.position.z += zunits;
+      } else {
+        this.create_pos.z -= zunits;
+        this.group.position.z -= zunits;
+      }
       if (this.paused) {
         return this.renderer.render(this.scene, this.camera);
       }
     };
 
     TextScene.prototype.advance_words = function() {
-      var advance, diff_sec, new_time, num_words, words_per_second, _results;
+      var advance, diff_sec, new_time, num_words, words_per_second;
       new_time = new Date().getTime();
       diff_sec = (new_time - this.time) / 1000.0;
       words_per_second = this.options.wpm / 60.0;
       this.time = new_time;
       num_words = words_per_second * diff_sec;
       advance = num_words * this.options.delta;
+      if (!this.options.away) {
+        advance = -advance;
+      }
       this.init_text(num_words, advance);
       this.group.position.z -= advance;
-      _results = [];
-      while ((this.group.children[0].position.z + this.group.position.z) < -500) {
-        _results.push(this.group.remove(this.group.children[0]));
+      if (this.group.children.length > 0) {
+        return this.clear();
       }
-      return _results;
+    };
+
+    TextScene.prototype.clear = function() {
+      var _results, _results1;
+      if (this.options.away) {
+        _results = [];
+        while ((this.group.children[0].position.z + this.group.position.z) < this.limit) {
+          _results.push(this.group.remove(this.group.children[0]));
+        }
+        return _results;
+      } else {
+        _results1 = [];
+        while ((this.group.children[0].position.z + this.group.position.z) > this.limit) {
+          _results1.push(this.group.remove(this.group.children[0]));
+        }
+        return _results1;
+      }
     };
 
     TextScene.prototype.animate = function() {

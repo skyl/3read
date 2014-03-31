@@ -4,6 +4,7 @@ wpm = parseFloat(localStorage['rate'] or 350)
 
 options = {
   color: new THREE.Color(0xffffff)
+  #color: new THREE.Color 0x000000
   size: 10
   height: 0
   curveSegments: 2
@@ -23,6 +24,11 @@ options = {
 
   axis: "z"
   wpm: wpm
+
+  # first iteration had "away" == true
+  # so, away = false means the words come at you.
+  #away: false
+  away: true
 
 }
 
@@ -62,7 +68,7 @@ void main() {
   //if (diff < delta) {
   //  vAlpha = 1.0;
   //} else {
-    vAlpha = 20.0 / diff;
+    vAlpha = 25.0 / diff;
   //}
 }
 """
@@ -102,7 +108,13 @@ class TextScene
   constructor: (@text, @material, @options) ->
     @words = @text.trim().split /\s+/g
     @word_place = 0
-    @create_pos = new THREE.Vector3 0, 0, @options.delta * 10
+    if @options.away
+      @create_pos = new THREE.Vector3 0, 0, @options.delta * 10
+      @limit = -500
+    else
+      @create_pos = new THREE.Vector3 0, 0, -(@options.delta * 10)
+      @limit = 500
+
     @init()
 
   init: () ->
@@ -111,6 +123,7 @@ class TextScene
     window.camera = @camera = new THREE.PerspectiveCamera 75, ratio, 0.1, 4000
     @renderer = new THREE.WebGLRenderer()
     @renderer.setSize window.innerWidth, window.innerHeight
+    #@renderer.setClearColorHex 0xffffff, 1
     document.body.appendChild @renderer.domElement
 
     if @options.debug
@@ -174,8 +187,12 @@ class TextScene
 
   # 20 * 10 with 1 advance
   rewind: (zunits=200) ->
-    @create_pos.z += zunits
-    @group.position.z += zunits
+    if @options.away
+      @create_pos.z += zunits
+      @group.position.z += zunits
+    else
+      @create_pos.z -= zunits
+      @group.position.z -= zunits
     if @paused
       @renderer.render @scene, @camera
 
@@ -187,15 +204,25 @@ class TextScene
 
     num_words = words_per_second * diff_sec
     advance = num_words * @options.delta
+    if not @options.away
+      advance = -advance
     @init_text num_words, advance
 
     @group.position.z -= advance
 
+    if @group.children.length > 0
+      @clear()
+
+  clear: () ->
     # this is a performance thing
     # but, then we can't rewind too much ...
     # not sure where to go with this.
-    while (@group.children[0].position.z + @group.position.z) < -500
-      @group.remove(@group.children[0])
+    if @options.away
+      while (@group.children[0].position.z + @group.position.z) < @limit
+        @group.remove(@group.children[0])
+    else
+      while (@group.children[0].position.z + @group.position.z) > @limit
+        @group.remove(@group.children[0])
 
   animate: () =>
     @animation_id = requestAnimationFrame @animate
