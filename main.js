@@ -18,7 +18,7 @@
     bevelEnabled: false,
     material: 0,
     extrudeMaterial: 1,
-    delta: 11,
+    delta: 12,
     axis: "z",
     wpm: wpm
   };
@@ -204,11 +204,11 @@
       requestAnimationFrame(this.render);
       if (!this.paused) {
         this.advance_words();
+        this.renderer.render(this.scene, this.camera);
+        if (this.options.debug) {
+          return this.stats.update();
+        }
       }
-      if (this.options.debug) {
-        this.stats.update();
-      }
-      return this.renderer.render(this.scene, this.camera);
     };
 
     TextScene.prototype.start = function() {

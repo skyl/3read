@@ -8,9 +8,7 @@ options = {
   height: 0
   curveSegments: 2
 
-  #font: "optimer"
   font: "ubuntu"
-  #weight: "bold"
   style: "normal"
 
   bevelThickness: 2
@@ -20,7 +18,7 @@ options = {
   material: 0
   extrudeMaterial: 1
 
-  delta: 11
+  delta: 12
   #debug: true
 
   axis: "z"
@@ -212,9 +210,9 @@ class TextScene
     requestAnimationFrame @render
     if not @paused
       @advance_words()
-    if @options.debug
-      @stats.update()
-    @renderer.render @scene, @camera
+      @renderer.render @scene, @camera
+      if @options.debug
+        @stats.update()
 
   start: () ->
     @time = new Date().getTime()
