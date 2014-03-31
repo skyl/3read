@@ -124,7 +124,6 @@ class TextScene
     @camera.lookAt origin
     @group = new THREE.Object3D()
     @scene.add @group
-
     @init_text()
 
   init_debug_stats: () ->
@@ -177,7 +176,8 @@ class TextScene
   rewind: (zunits=200) ->
     @create_pos.z += zunits
     @group.position.z += zunits
-    @set_opacities
+    if @paused
+      @renderer.render @scene, @camera
 
   advance_words: () ->
     new_time = new Date().getTime()
@@ -189,38 +189,32 @@ class TextScene
     advance = num_words * @options.delta
     @init_text num_words, advance
 
-    #change = -advance
     @group.position.z -= advance
-    #@set_opacities()
 
-  set_opacities: () ->
-    # set opacity based on distance to origin
-    for mesh in @group.children
-      #mesh.position.z += change
-      #centeredp = mesh.position.clone()
-      x = 0
-      y = 0
-      z = mesh.position.z + @group.position.z
-      distance_to_focus = (new THREE.Vector3(x, y, z)).distanceTo window.focus
-      opacity = @options.delta / distance_to_focus
-      mesh.material.opacity = opacity
-      #mesh.quaternion = @camera.quaternion
+    # this is a performance thing
+    # but, then we can't rewind too much ...
+    # not sure where to go with this.
+    while (@group.children[0].position.z + @group.position.z) < -500
+      @group.remove(@group.children[0])
 
-  render: () =>
-    requestAnimationFrame @render
-    if not @paused
-      @advance_words()
-      @renderer.render @scene, @camera
-      if @options.debug
-        @stats.update()
+  animate: () =>
+    @animation_id = requestAnimationFrame @animate
+    @render()
+
+  render: () ->
+    @advance_words()
+    @renderer.render @scene, @camera
+    if @options.debug
+      @stats.update()
 
   start: () ->
     @time = new Date().getTime()
     @paused = false
-    @render()
+    @animate()
 
   pause: () ->
     @paused = true
+    cancelAnimationFrame @animation_id
 
   onKeyup: (ev) =>
     # Alt+UP is rewind

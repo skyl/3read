@@ -68,7 +68,7 @@
       this.options = options;
       this.onResize = __bind(this.onResize, this);
       this.onKeyup = __bind(this.onKeyup, this);
-      this.render = __bind(this.render, this);
+      this.animate = __bind(this.animate, this);
       this.words = this.text.trim().split(/\s+/g);
       this.word_place = 0;
       this.create_pos = new THREE.Vector3(0, 0, this.options.delta * 10);
@@ -169,11 +169,13 @@
       }
       this.create_pos.z += zunits;
       this.group.position.z += zunits;
-      return this.set_opacities;
+      if (this.paused) {
+        return this.renderer.render(this.scene, this.camera);
+      }
     };
 
     TextScene.prototype.advance_words = function() {
-      var advance, diff_sec, new_time, num_words, words_per_second;
+      var advance, diff_sec, new_time, num_words, words_per_second, _results;
       new_time = new Date().getTime();
       diff_sec = (new_time - this.time) / 1000.0;
       words_per_second = this.options.wpm / 60.0;
@@ -181,44 +183,36 @@
       num_words = words_per_second * diff_sec;
       advance = num_words * this.options.delta;
       this.init_text(num_words, advance);
-      return this.group.position.z -= advance;
-    };
-
-    TextScene.prototype.set_opacities = function() {
-      var distance_to_focus, mesh, opacity, x, y, z, _i, _len, _ref, _results;
-      _ref = this.group.children;
+      this.group.position.z -= advance;
       _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        mesh = _ref[_i];
-        x = 0;
-        y = 0;
-        z = mesh.position.z + this.group.position.z;
-        distance_to_focus = (new THREE.Vector3(x, y, z)).distanceTo(window.focus);
-        opacity = this.options.delta / distance_to_focus;
-        _results.push(mesh.material.opacity = opacity);
+      while ((this.group.children[0].position.z + this.group.position.z) < -500) {
+        _results.push(this.group.remove(this.group.children[0]));
       }
       return _results;
     };
 
+    TextScene.prototype.animate = function() {
+      this.animation_id = requestAnimationFrame(this.animate);
+      return this.render();
+    };
+
     TextScene.prototype.render = function() {
-      requestAnimationFrame(this.render);
-      if (!this.paused) {
-        this.advance_words();
-        this.renderer.render(this.scene, this.camera);
-        if (this.options.debug) {
-          return this.stats.update();
-        }
+      this.advance_words();
+      this.renderer.render(this.scene, this.camera);
+      if (this.options.debug) {
+        return this.stats.update();
       }
     };
 
     TextScene.prototype.start = function() {
       this.time = new Date().getTime();
       this.paused = false;
-      return this.render();
+      return this.animate();
     };
 
     TextScene.prototype.pause = function() {
-      return this.paused = true;
+      this.paused = true;
+      return cancelAnimationFrame(this.animation_id);
     };
 
     TextScene.prototype.onKeyup = function(ev) {
