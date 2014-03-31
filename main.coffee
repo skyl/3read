@@ -7,9 +7,7 @@ options = {
   height: 0
   curveSegments: 2
 
-  #font: "optimer"
   font: "ubuntu"
-  #weight: "bold"
   style: "normal"
 
   bevelThickness: 2
