@@ -1,7 +1,7 @@
 {
   "name": "3read",
-  "version": "0.0.1",
-  "description": "3read allows you to read selected text in 3 dimensions.",
+  "version": "0.0.2",
+  "description": "3read allows you to read selected text in 3 dimensions. It can aid in speed reading, if you like.",
   "permissions": [
     "<all_urls>",
     "tabs"
