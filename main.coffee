@@ -99,7 +99,7 @@ shaderMaterial = new THREE.ShaderMaterial {
   attributes: attributes
   vertexShader: vertex_shader
   fragmentShader: fragment_shader
-  transparent:    true
+  transparent: true
 }
 
 
