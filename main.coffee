@@ -35,35 +35,6 @@ options = {
 window.origin = new THREE.Vector3 0, 0, 0
 window.focus = new THREE.Vector3 0, 0, 40
 
-xhr = new XMLHttpRequest()
-xhr.open "get", "shaders.c", false
-xhr.send null
-window.shaders = xhr.responseText.split "//FRAGMENT"
-window.vertex_shader = shaders[0]
-window.fragment_shader = shaders[1]
-console.log "OK"
-console.log "shaders", shaders
-console.log "vertex_shader", vertex_shader
-console.log "fragment_shader", fragment_shader
-
-# attributes
-attributes = {
-  alpha: {type: 'f', value: []}
-}
-# uniforms
-uniforms = {
-  color: {type: "c", value: options.color}
-  # these are in 2d y, for now ...
-  delta: {type: "f", value: options.delta / 10.0}
-  focus: {type: "f", value: -40.0}
-}
-shaderMaterial = new THREE.ShaderMaterial {
-  uniforms: uniforms
-  attributes: attributes
-  vertexShader: vertex_shader
-  fragmentShader: fragment_shader
-  transparent: true
-}
 
 
 class TextScene
@@ -234,9 +205,41 @@ class TextScene
     camera.updateProjectionMatrix();
 
 
-#material = new THREE.MeshBasicMaterial color: 0xffffff, transparent: true, opacity: 0.5
-material = shaderMaterial
-window.ts = new TextScene TEXT, material, options
-window.addEventListener "keyup", ts.onKeyup, false
-window.addEventListener 'resize', ts.onResize, false
-ts.start()
+main = () ->
+  xhr = new XMLHttpRequest()
+  xhr.open "get", "shaders.c", false
+  xhr.send null
+  window.shaders = xhr.responseText.split "//FRAGMENT"
+  window.vertex_shader = shaders[0]
+  window.fragment_shader = shaders[1]
+  #console.log "OK"
+  #console.log "shaders", shaders
+  #console.log "vertex_shader", vertex_shader
+  #console.log "fragment_shader", fragment_shader
+
+  # attributes
+  attributes = {
+    alpha: {type: 'f', value: []}
+  }
+  # uniforms
+  uniforms = {
+    color: {type: "c", value: options.color}
+    # these are in 2d y, for now ...
+    delta: {type: "f", value: options.delta / 10.0}
+    focus: {type: "f", value: -40.0}
+  }
+  shaderMaterial = new THREE.ShaderMaterial {
+    uniforms: uniforms
+    attributes: attributes
+    vertexShader: vertex_shader
+    fragmentShader: fragment_shader
+    transparent: true
+  }
+
+  material = shaderMaterial
+  window.ts = new TextScene TEXT, material, options
+  window.addEventListener "keyup", ts.onKeyup, false
+  window.addEventListener 'resize', ts.onResize, false
+  ts.start()
+
+window.onload = main
