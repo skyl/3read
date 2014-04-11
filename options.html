@@ -63,9 +63,7 @@
     }
   </style>
   <script src="keycodes.js"></script>
-  <script src="tabs.js"></script>
   <script src="options.js"></script>
-  <script src="content_script.js"></script>
 </head>
 <body>
 
@@ -116,14 +114,15 @@
         <span id="selected">Select some text</span>
         anywhere on a webpage, then either:
       </p>
-
-      <p>1. Click on the
-        <img class="browser_action" src="icon_19.png" alt="3read icon">
-        button in the toolbar &#x2197;, or
-      </p>
-      <p>2. Use this hot key: <input type="text" id="hotkey"></input>
-      </p>
-      <p>Press the key again to close the window.</p>
+      <ol>
+        <li>Click on the<img class="browser_action" src="icon_19.png" alt="3read icon">
+        button in the toolbar &#x2197;
+        </li>
+        <li>Use this hot key: alt+r<br>
+        You may change this by visiting <a href="#" id="extensions">chrome://extensions/</a>
+        and clicking on "keyboard shortcuts".
+        </li>
+      </ol>
     </div>
   </div>
 

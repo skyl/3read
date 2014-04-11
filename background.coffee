@@ -1,17 +1,36 @@
-#console.log "BACKGROUND!"
-
-if localStorage['lastVersionUsed'] isnt '0.0.1'
-  localStorage['lastVersionUsed'] = '0.0.1'
+version = chrome.app.getDetails().version
+if localStorage['lastVersionUsed'] isnt version
+  localStorage['lastVersionUsed'] = version
   chrome.tabs.create {
     url: chrome.extension.getURL('options.html')
   }
 
 
+funcToInject = () ->
+  return window.getSelection().toString()
+
+jsCodeStr = ";(" + funcToInject + ")();"
+
+
+start_callback = (e) ->
+  details = {
+    code: jsCodeStr,
+    allFrames:true
+  }
+  cb = (arr) ->
+    if (chrome.runtime.lastError)
+      console.log chrome.runtime.lastError
+      read chrome.runtime.lastError.message
+    else
+      read arr[0]
+  chrome.tabs.executeScript details, cb
+
+
 read = (text) ->
   text = encodeURIComponent text
-  # console.log "READING!", text
   opts = {
     url: chrome.extension.getURL("main.html?text=#{text}")
+    # TODO - save width and height
     width: 960
     height: 600
     type: "popup"
@@ -22,32 +41,14 @@ read = (text) ->
   chrome.windows.create opts, cb
 
 
-onRequest = (request, sender, sendResponse) ->
-  #console.log "background onRequest!"
-  if request['init']
-    sendResponse {'key': localStorage['speakKey']}
-  else if request['read']
-    read request['read']
+context_read = (context) ->
+  read context.selectionText
 
 
-onClicked = (tab) ->
-  #console.log "background onClicked"
-  chrome.tabs.sendRequest tab.id, {'readSelection': true}
-
-
-initBackground = () ->
-  #console.log "initBackground"
-  # ???
-  loadContentScriptInAllTabs()
-  defaultKeyString = getDefaultKeyString();
-  keyString = localStorage['speakKey']
-  if keyString is undefined
-    keyString = defaultKeyString
-    localStorage['speakKey'] = keyString
-  sendKeyToAllTabs keyString
-
-  chrome.extension.onRequest.addListener onRequest
-
-  chrome.browserAction.onClicked.addListener onClicked
-
-initBackground();
+chrome.commands.onCommand.addListener start_callback
+chrome.browserAction.onClicked.addListener start_callback
+chrome.contextMenus.create {
+  "title": "3read",
+  "contexts": ["selection"],
+  "onclick": context_read,
+}

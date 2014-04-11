@@ -35,53 +35,16 @@ options = {
 window.origin = new THREE.Vector3 0, 0, 0
 window.focus = new THREE.Vector3 0, 0, 40
 
-
-vertex_shader = """
-/*
-attribute float alpha;
-varying float vAlpha;
-
-void main() {
-  vAlpha = alpha;
-  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-  gl_PointSize = 20.0;
-  gl_Position = projectionMatrix * mvPosition;
-}
-*/
-
-uniform float delta;
-uniform float focus;
-
-varying float vAlpha;
-
-float diff;
-
-void main() {
-  //vAlpha = 10.0 / abs(position.x);
-  //vAlpha = 10.0 / position.y;
-  //vAlpha = position.z;
-  gl_Position = projectionMatrix *
-                modelViewMatrix *
-                vec4(position, 1.0);
-
-  diff = abs(gl_Position.y - focus);
-  //if (diff < delta) {
-  //  vAlpha = 1.0;
-  //} else {
-    vAlpha = 25.0 / diff;
-  //}
-}
-"""
-
-fragment_shader = """
-uniform vec3 color;
-varying float vAlpha;
-//varying float red;
-
-void main() {
-  gl_FragColor = vec4(color, vAlpha);
-}
-"""
+xhr = new XMLHttpRequest()
+xhr.open "get", "shaders.c", false
+xhr.send null
+window.shaders = xhr.responseText.split "//FRAGMENT"
+window.vertex_shader = shaders[0]
+window.fragment_shader = shaders[1]
+console.log "OK"
+console.log "shaders", shaders
+console.log "vertex_shader", vertex_shader
+console.log "fragment_shader", fragment_shader
 
 # attributes
 attributes = {

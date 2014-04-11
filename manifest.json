@@ -1,16 +1,13 @@
 {
   "name": "3read",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "3read allows you to read selected text in 3 dimensions. It can aid in speed reading, if you like.",
-  "permissions": [
-    "<all_urls>",
-    "tabs"
-  ],
+
+  "permissions": ["contextMenus", "activeTab"],
 
   "background": {
     "scripts": [
       "keycodes.js",
-      "tabs.js",
       "background.js"
     ]
   },
@@ -20,22 +17,18 @@
     "default_title": "3read Selection"
   },
 
+  "commands": {
+    "read": {
+      "suggested_key": {
+        "default": "Alt+R"
+      },
+      "description": "3read!"
+    }
+  },
+
   "options_page": "options.html",
 
   "minimum_chrome_version": "18",
-
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "all_frames": true,
-      "js": [
-        "keycodes.js",
-        "content_script.js"
-      ]
-    }
-  ],
 
   "icons": {
     "16": "icon_16.png",
