@@ -288,7 +288,13 @@
     window.ts = new TextScene(TEXT, material, options);
     window.addEventListener("keyup", ts.onKeyup, false);
     window.addEventListener('resize', ts.onResize, false);
-    return ts.start();
+    if (localStorage['fullscreen'] === "true") {
+      return setTimeout((function() {
+        return ts.start();
+      }), 1000);
+    } else {
+      return ts.start();
+    }
   };
 
   window.onload = main;

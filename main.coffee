@@ -240,6 +240,10 @@ main = () ->
   window.ts = new TextScene TEXT, material, options
   window.addEventListener "keyup", ts.onKeyup, false
   window.addEventListener 'resize', ts.onResize, false
-  ts.start()
+  # we need to wait for the fullscreen
+  if localStorage['fullscreen'] is "true"
+    setTimeout((() -> ts.start()), 1000)
+  else
+    ts.start()
 
 window.onload = main

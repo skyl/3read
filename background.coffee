@@ -34,6 +34,7 @@ read = (text) ->
     width: 960
     height: 600
     type: "popup"
+    #state: "fullscreen"
   }
   cb = (wind) ->
     if localStorage['fullscreen'] is "true"
