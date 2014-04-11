@@ -28,7 +28,13 @@
         console.log(chrome.runtime.lastError);
         return read(chrome.runtime.lastError.message);
       } else {
-        return read(arr[0]);
+        if (arr[0] === "") {
+          return chrome.tabs.create({
+            url: chrome.extension.getURL('options.html')
+          });
+        } else {
+          return read(arr[0]);
+        }
       }
     };
     return chrome.tabs.executeScript(details, cb);

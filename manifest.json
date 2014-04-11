@@ -1,6 +1,6 @@
 {
   "name": "3read",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "3read allows you to read selected text in 3 dimensions. It can aid in speed reading, if you like.",
 
   "permissions": ["contextMenus", "activeTab"],
@@ -14,7 +14,7 @@
 
   "browser_action": {
     "default_icon": "icon_19.png",
-    "default_title": "3read Selection"
+    "default_title": "3read Selection",
   },
 
   "commands": {

@@ -22,7 +22,12 @@ start_callback = (e) ->
       console.log chrome.runtime.lastError
       read chrome.runtime.lastError.message
     else
-      read arr[0]
+      if arr[0] == ""
+        chrome.tabs.create {
+          url: chrome.extension.getURL('options.html')
+        }
+      else
+        read arr[0]
   chrome.tabs.executeScript details, cb
 
 
@@ -34,7 +39,6 @@ read = (text) ->
     width: 960
     height: 600
     type: "popup"
-    #state: "fullscreen"
   }
   cb = (wind) ->
     if localStorage['fullscreen'] is "true"
