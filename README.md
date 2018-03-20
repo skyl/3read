@@ -6,7 +6,7 @@ I need your help to improve performance.
 
 checkout this code:
 
-    git checkout https://github.com/skyl/3read
+    git clone https://github.com/skyl/3read
 
 Go to [chrome://extensions](chrome://extensions)
 and click "Load unpacked extension".
