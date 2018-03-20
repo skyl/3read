@@ -1,14 +1,7 @@
 
 3read lets you highlight text and read it on the z-axis.
 
-<iframe 
-  width="560"
-  height="315" 
-  src="https://www.youtube.com/embed/5-lZu53yB4w" 
-  frameborder="0"
-  allow="autoplay; encrypted-media" 
-  allowfullscreen
-></iframe>
+[![Video](https://img.youtube.com/vi/5-lZu53yB4w/0.jpg)](https://www.youtube.com/watch?v=5-lZu53yB4w)
 
 It utilizes THREE.js. But, in a naive way.
 I need your help to improve performance.
